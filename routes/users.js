@@ -7,12 +7,19 @@ var User = require('../models/users');
 var router = express.Router();
 router.use(bodyParser.json());
 
-router.get('/', (req, res, next) => {
-  res.send('respond wiht a resource');
+router.get('/', authenticate.verifyAdmin, (req, res, next) => {
+  //console.log('in get /users with verifyAdmin:'+ authenticate.verifyAdmin);
+  User.find({})
+    .then((users) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(users);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 });
 
 router.post('/signup', (req, res, next) => {
-  console.log('req body: ' + req.body.username + ' ' + req.body.password);
+  //console.log('req body: ' + req.body.username + ' ' + req.body.password);
   User.register(new User({username: req.body.username}),   //, password: req.body.password
     req.body.password, (err, user) => {
     if(err) {

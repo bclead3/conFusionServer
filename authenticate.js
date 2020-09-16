@@ -13,7 +13,7 @@ passport.deserializeUser(User.deserializeUser());
 
 exports.getToken = function(user) {
     return jwt.sign(user, config.secretKey, 
-        {expiresIn: 3600});
+        {expiresIn: 3600*12});
 };
 
 var opts = {};
@@ -25,31 +25,23 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
         console.log("JWT payload: ", jwt_payload);
         User.findOne({_id: jwt_payload._id}, (err, user) => {
             if (err) {
-                return done(err, false);
+                err.status(403);
+                return done(err, false, false);
             }
             else if (user) {
-                return done(null, user);
+                if (user.admin) {
+                    return done(null, user, true);
+                }
+                else {
+                    return done(null, user, false);
+                }
             }
             else {
-                return done(null, false);
+                return done(null, false, false);
             }
         });
     }));
 
-exports.verifyUser = passport.authenticate('jwt', {session: false});
+exports.verifyUser = passport.authenticate('jwt', { session: false });
 
-exports.verifyAdmin = passport.use(new JwtStrategy(opts, 
-    (jwt_payload, done) => {
-        console.log("JWT payload: ", jwt_payload);
-        User.findOne({admin: true}, (err, user) => {
-            if (err) {
-                return done(err, false);
-            }
-            else if (user) {
-                return done(null, user);
-            }
-            else {
-                return done(null, false);
-            }
-        });
-    }));
+exports.verifyAdmin = passport.authenticate('jwt', { session: false });
