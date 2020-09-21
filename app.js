@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
+var favoritesRouter = require('./routes/favoritesRouter');
 
 
 const mongoose = require('mongoose');
@@ -25,6 +26,7 @@ const Dishes = require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
 const Users = require('./models/users');
+const Favorite = require('./models/favorite');
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);  //, { useNewUrlParser: true, useUnifiedTopology: true }
@@ -79,6 +81,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
+app.use('/favorites', favoritesRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
